@@ -6,8 +6,8 @@ Created on Jul 21, 2017
 import json
 import requests
 
-from  me.salimm.jrns.common.Constants import RPC_PROTOCOL
-from me.salimm.jrns.common.info.ServiceInfo import ServiceInfo
+from  org.mouji.jrns.common.Constants import RPC_PROTOCOL
+from org.mouji.jrns.common.info.ServiceInfo import ServiceInfo
 
 
 class JRNSStub:

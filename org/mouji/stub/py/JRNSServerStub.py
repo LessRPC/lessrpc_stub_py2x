@@ -3,7 +3,7 @@ Created on Jul 21, 2017
 
 @author: Salim
 '''
-from me.salimm.jrns.stub.py.JRNSStub import JRNSStub
+from org.mouji.stub.py.JRNSStub import JRNSStub
 
 
 class JRNSServerStub(JRNSStub):

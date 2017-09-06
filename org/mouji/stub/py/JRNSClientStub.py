@@ -4,18 +4,18 @@ Created on Jul 21, 2017
 @author: Salim
 '''
 
-from me.salimm.jrns.stub.py.JRNSStub import JRNSStub 
-from me.salimm.jrns.common.Constants import RPC_PROTOCOL
-from me.salimm.jrns.common.info.ServiceProviderInfo import ServiceProviderInfo
-from me.salimm.jrns.common.Utils import class_for_name
+from org.mouji.stub.py.JRNSStub import JRNSStub 
+from org.mouji.jrns.common.Constants import RPC_PROTOCOL
+from org.mouji.jrns.common.info.ServiceProviderInfo import ServiceProviderInfo
+from org.mouji.jrns.common.Utils import class_for_name
 
 import requests
 import json
 import socket
 
-from me.salimm.jrns.common.ExecutionResponse import ExecutionResponse
-from me.salimm.jrns.common.info.ClientInfo import ClientInfo
-from me.salimm.jrns.common.types.StubEnvType import StubEnvType
+from org.mouji.jrns.common.ExecutionResponse import ExecutionResponse
+from org.mouji.jrns.common.info.ClientInfo import ClientInfo
+from org.mouji.jrns.common.types.StubEnvType import StubEnvType
 
 
 class JRNSClientStub(JRNSStub):
