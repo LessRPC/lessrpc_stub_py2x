@@ -3,27 +3,27 @@ Created on Nov 7, 2017
 
 @author: Salim
 '''
-from org.lessrpc.stub.py.stubs.base import Stub
-from org.lessrpc.stub.py.StubConstants import LESS_RPC_REQUEST_PING, LESS_RPC_REQUEST_INFO, LESS_RPC_REQUEST_SERVICE, LESS_RPC_REQUEST_EXECUTE, HTTP_WAIT_TIME_SHORT, HTTP_WAIT_TIME_LONG
+from lessrpc.stub.stubs.base import Stub
+from lessrpc.stub.StubConstants import LESS_RPC_REQUEST_PING, LESS_RPC_REQUEST_INFO, LESS_RPC_REQUEST_SERVICE, LESS_RPC_REQUEST_EXECUTE, HTTP_WAIT_TIME_SHORT, HTTP_WAIT_TIME_LONG
 import httplib
-from org.lessrpc.common.py.errors.less import ResponseContentTypeCannotBePrasedException, \
+from lessrpc.common.errors.less import ResponseContentTypeCannotBePrasedException, \
     SerializationFormatNotSupported, ApplicationSpecificErrorException, \
     RPCProviderFailureException, ServiceProviderNotAvailable
-from org.lessrpc.common.py.info.basic import SerializationFormat, ServiceInfo, \
+from lessrpc.common.info.basic import SerializationFormat, ServiceInfo, \
     EnvironmentInfo, ServiceLocator, ServiceDescription
-from org.lessrpc.common.py.errors.lessrpc import RPCException
-from org.lessrpc.common.py.info.response import TextResponse, IntegerResponse, \
+from lessrpc.common.errors.lessrpc import RPCException
+from lessrpc.common.info.response import TextResponse, IntegerResponse, \
     ProviderInfoResponse, ServiceSupportResponse, ExecuteRequestResponse
 from pylods.error import ParseException
 from io import BytesIO
-from org.lessrpc.stub.py.serializer import JsonSerializer
-from org.lessrpc.common.py.info.request import ServiceRequest
+from lessrpc.stub.serializer import JsonSerializer
+from lessrpc.common.info.request import ServiceRequest
 from httpoutputsteam.stream import HttpBufferedOutstream
 from pylods.deserialize import DeserializationContext
-from org.lessrpc.common.py.services import NameServerServices, \
+from lessrpc.common.services import NameServerServices, \
     NameServerFunctions
-from org.lessrpc.stub.py.cache import NoCache, SimpleCache
-from org.lessrpc.stub.py.errors import NoProviderAvailableException
+from lessrpc.stub.cache import NoCache, SimpleCache
+from lessrpc.stub.errors import NoProviderAvailableException
 import traceback
 
 

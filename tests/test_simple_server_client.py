@@ -1,14 +1,14 @@
 
 import unittest
-from org.lessrpc.common.py.info.basic import EnvironmentInfo, \
+from lessrpc.common.info.basic import EnvironmentInfo, \
     ServiceProviderInfo, SerializationFormat, ServiceInfo, ServiceSupportInfo, \
     ServiceDescription
-from org.lessrpc.common.py.errors.less import ServiceNotSupportedException
-from org.lessrpc.common.py.services import ServiceProvider
-from org.lessrpc.stub.py.stubs.server import ServerStub
+from lessrpc.common.errors.less import ServiceNotSupportedException
+from lessrpc.common.services import ServiceProvider
+from lessrpc.stub.stubs.server import ServerStub
 import threading
-from org.lessrpc.stub.py.stubs.client import ClientStub
-from org.lessrpc.stub.py.serializer import JsonSerializer
+from lessrpc.stub.stubs.client import ClientStub
+from lessrpc.stub.serializer import JsonSerializer
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,7 +70,7 @@ class TestProvider(ServiceProvider):
         '''
             Returns the list of all supported services
         '''
-        return [ServiceDescription(ServiceInfo('test', 1), [int,int], int), ServiceDescription(ServiceInfo('test2', 2), [int], ServiceInfo)]
+        return [ServiceDescription(ServiceInfo('test', 1), [int, int], int), ServiceDescription(ServiceInfo('test2', 2), [int], ServiceInfo)]
 
 
 
@@ -82,7 +82,7 @@ class TestServerClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         prov = TestProvider()
-        cls.stub = ServerStub(prov)
+        cls.stub = ServerStub(prov, serializers=[JsonSerializer()])
         cls.spinfo = prov.info();
         cls.t = threading.Thread(target=cls.stub.start)
         cls.t.start()
@@ -131,9 +131,9 @@ class TestServerClient(unittest.TestCase):
         
         
     def test_execute_choose_format(self):
-        client = ClientStub([]);
+        client = ClientStub([JsonSerializer()]);
         desc = ServiceDescription(ServiceInfo('test', 1), [int, int], int) 
-        res = client.call(desc, ServiceProviderInfo("localhost", 4342, EnvironmentInfo.current_env_info()), [1, 2], JsonSerializer(), accept=[SerializationFormat.default_format()])
+        res = client.call(desc, ServiceProviderInfo("localhost", 4342, EnvironmentInfo.current_env_info()), [1, 2], JsonSerializer(), accept=[SerializationFormat("MSGPACK", "2.0")])
         
         self.assertEquals(res, res)
     

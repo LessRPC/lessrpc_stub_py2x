@@ -6,7 +6,7 @@ Created on Nov 7, 2017
 
 import random
 from datetime import datetime
-from org.lessrpc.stub.py.serializer import JsonSerializer
+from lessrpc.stub.serializer import JsonSerializer
 
 class Stub():
     

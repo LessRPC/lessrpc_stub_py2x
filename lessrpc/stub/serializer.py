@@ -3,11 +3,10 @@ Created on Nov 7, 2017
 
 @author: Salim
 '''
-from org.lessrpc.common.py.serialize import Serializer
-from org.lessrpc.common.py.info.basic import SerializationFormat
+from lessrpc.common.serialize import Serializer
+from lessrpc.common.info.basic import SerializationFormat
 from pylodsjson.pylodsjson import JsonObjectMapper, JsonParser
 from pylods.deserialize import DeserializationContext
-from typing import BinaryIO
 
 
 

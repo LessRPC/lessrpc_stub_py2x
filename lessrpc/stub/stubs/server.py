@@ -12,20 +12,20 @@ from io import BytesIO
 import cherrypy
 
 
-from org.lessrpc.common.py.types import StatusType
-from org.lessrpc.common.py.info.basic import SerializationFormat, \
+from lessrpc.common.types import StatusType
+from lessrpc.common.info.basic import SerializationFormat, \
      ServiceInfo, ServiceLocator
-from org.lessrpc.common.py.errors.less import AcceptTypeHTTPFormatNotParsable, \
+from lessrpc.common.errors.less import AcceptTypeHTTPFormatNotParsable, \
     AcceptTypeNotSupported, WrongHTTPMethodException, ContentTypeNotSupported, \
     ContentTypeHTTPFormatNotParsable, ServiceNotSupportedException
-from org.lessrpc.common.py.info.response import TextResponse, IntegerResponse, \
+from lessrpc.common.info.response import TextResponse, IntegerResponse, \
     ProviderInfoResponse, ServiceSupportResponse, ExecuteRequestResponse, ServiceResponse     
-from org.lessrpc.common.py.info.request import ServiceRequest
+from lessrpc.common.info.request import ServiceRequest
 
-from org.lessrpc.stub.py.stubs.base import Stub
-from org.lessrpc.common.py.errors.lessrpc import ServerStubNotInitialized
+from lessrpc.stub.stubs.base import Stub
+from lessrpc.common.errors.lessrpc import ServerStubNotInitialized
 from pylods.deserialize import DeserializationContext
-from org.lessrpc.stub.py.stubs.client import NSClient
+from lessrpc.stub.stubs.client import NSClient
 
 
 
@@ -153,13 +153,14 @@ class ServerStubHandler():
         '''
         handles lessrpc's /execute request
         '''
+        
         (flag, reqserializer, respserializer, status) = self.process_lessrpc_headers(True)
         
         if not flag:
             return status
         
         try:
-            request = reqserializer.deserialize(BodyWrapper(cherrypy.request.body), ServiceRequest, ctxt=DeserializationContext.create_context([("CLSLOCATOR",ServiceLocator.create(self.provider.list_services()))]))
+            request = reqserializer.deserialize(BodyWrapper(cherrypy.request.body), ServiceRequest, ctxt=DeserializationContext.create_context([("CLSLOCATOR", ServiceLocator.create(self.provider.list_services()))]))
         except:
             traceback.print_exc();
             return self.prepare_status(StatusType.SERIALIZATION_ERROR, respserializer.get_type())
@@ -198,7 +199,7 @@ class ServerStubHandler():
                 return (False, None, None, status);
             # setting response serialization format regardless if there is an error
             # or successful attempt
-            cherrypy.response.headers['Content-Type'] = SerializationFormat.default_format().http_format()
+            cherrypy.response.headers['Content-Type'] = respserializer.get_type().http_format()
             
             # check if get and post are being used properly
             try:
@@ -431,7 +432,7 @@ class NSServerStub(ServerStub):
     def __init__(self, provider, nsinfo, serializers=[]):
         ServerStub.__init__(self, provider, serializers)
         self.__nsinfo__ = nsinfo
-        self.__ns__ = NSClient(nsinfo,serializers)
+        self.__ns__ = NSClient(nsinfo, serializers)
         
 
     def after_start(self):
