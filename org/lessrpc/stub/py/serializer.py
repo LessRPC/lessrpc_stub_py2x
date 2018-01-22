@@ -56,5 +56,6 @@ class JsonSerializer(Serializer):
     def copy(self):
         tmp = JsonSerializer()
         tmp.__mapper = self.__mapper.copy()
+        return tmp
     
     

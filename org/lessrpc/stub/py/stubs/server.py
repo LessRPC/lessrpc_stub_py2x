@@ -430,11 +430,6 @@ class ServerStub(Stub):
     
     
 
-
-
-
-
-
 class NSServerStub(ServerStub):
     
     def __init__(self, provider, nsinfo, serializers=[]):
@@ -442,10 +437,7 @@ class NSServerStub(ServerStub):
         self.__nsinfo__ = nsinfo
         self.__ns__ = NSClient(nsinfo,serializers)
         
-            
-        
-        
-        
+
     def after_start(self):
         '''
             Registers all supported services for this provider
