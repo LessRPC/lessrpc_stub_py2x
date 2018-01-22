@@ -176,12 +176,8 @@ class ServerStubHandler():
             return self.prepare_status(StatusType.INTERNAL_ERROR, respserializer.get_type())
         try:
             out = BytesIO()
-#             print(result)
-#             print(ExecuteRequestResponse(StatusType.OK.value, ServiceResponse(request.service, result, request.requestid)))
-            print(vars(ServiceResponse(request.service, result, request.requestid)))
             respserializer.serialize(ExecuteRequestResponse(StatusType.OK.value, ServiceResponse(request.service, result, request.requestid)), ExecuteRequestResponse, out)
             out.seek(0)
-#             print(out.getvalue())        
             return out
         except:
             traceback.print_exc();

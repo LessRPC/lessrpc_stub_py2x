@@ -40,7 +40,7 @@ class ClientStub(Stub):
         
         
     
-    def call(self, desc, spInfo, args, serializer, timeout=HTTP_WAIT_TIME_LONG):
+    def call(self, desc, spInfo, args, serializer, timeout=HTTP_WAIT_TIME_LONG, accept=None):
         '''
         
         :param service: ServiceInfo
@@ -49,12 +49,13 @@ class ClientStub(Stub):
         :param serializer: Serializer used
         :return ServiceResponse: 
         '''
+        
         request = ServiceRequest.create(desc.info, EnvironmentInfo.current_env_info() , self.get_random_id(), args)
         
         result = None
         
         try:
-            headers = {'Accept': self.get_accepted_types(), 'Content-Type':serializer.get_type().http_format(), 'Transfer-Encoding': 'chunked'}
+            headers = {'Accept': self.get_accepted_types(accept), 'Content-Type':serializer.get_type().http_format(), 'Transfer-Encoding': 'chunked'}
             
             # http connection
             conn = httplib.HTTPConnection(str(spInfo.url) + ":" + str(spInfo.port), timeout=timeout)
@@ -98,7 +99,7 @@ class ClientStub(Stub):
         ping = None
         
         
-        headers = {'Accept': self.get_accepted_types()}
+        headers = {'Accept': self.get_accepted_types([SerializationFormat.default_format()])}
         try:
             conn = httplib.HTTPConnection(str(spInfo.url) + ":" + str(spInfo.port), timeout=timeout)
             conn.request("GET", LESS_RPC_REQUEST_PING, headers=headers)
@@ -132,7 +133,7 @@ class ClientStub(Stub):
         '''
         info = None
         
-        headers = {'Accept': self.get_accepted_types()}
+        headers = {'Accept': self.get_accepted_types([SerializationFormat.default_format()])}
         try:
             conn = httplib.HTTPConnection(url + ":" + str(port), timeout=timeout)
             conn.request("GET", LESS_RPC_REQUEST_INFO, headers=headers)
@@ -161,7 +162,7 @@ class ClientStub(Stub):
             length = out.tell()
             out.seek(0)
             
-            headers = {'Accept': self.get_accepted_types(), 'Content-Type':serializer.get_type().http_format(), 'Content-Length': length}
+            headers = {'Accept': self.get_accepted_types([SerializationFormat.default_format()]), 'Content-Type':serializer.get_type().http_format(), 'Content-Length': length}
             
             # http connection
             conn = httplib.HTTPConnection(str(spInfo.url) + ":" + str(spInfo.port), timeout=timeout)
@@ -348,14 +349,14 @@ class NSClient(ClientStub, NameServerFunctions):
 class NSClientStub(ClientStub):    
     
     
-    def __init__(self, nsInfo, cache=NoCache(),serializers=[]):
+    def __init__(self, nsInfo, cache=NoCache(), serializers=[]):
         ClientStub.__init__(self, serializers)
         self.__nsInfo = nsInfo
-        self.__ns = NSClient(nsInfo,serializers)
+        self.__ns = NSClient(nsInfo, serializers)
         self.__cache = cache
     
     def get_service_support(self, service):
-        return ClientStub.get_service_support(self,self._get_provider(service).provider, service);
+        return ClientStub.get_service_support(self, self._get_provider(service).provider, service);
     
     def _get_provider(self, service):
         '''
@@ -375,7 +376,7 @@ class NSClientStub(ClientStub):
         return info;
     
     
-    def call(self, desc, args, serializer):
+    def call(self, desc, args, serializer, accept=None):
         '''
         calls execute service. It uses cached service provider or retrieves an
         available provider from the name server
@@ -394,7 +395,7 @@ class NSClientStub(ClientStub):
         response = None;
         
         try :
-            response = ClientStub.call(self, desc, provider, args, serializer);
+            response = ClientStub.call(self, desc, provider, args, serializer, accept);
         except (ResponseContentTypeCannotBePrasedException, RPCException, SerializationFormatNotSupported):
             # none connectivity error happened
             raise
@@ -542,5 +543,5 @@ if __name__ == '__main__':
     print(sup)
     
     
-    res = client.call(ServiceDescription(service,[int],int), [5], JsonSerializer());
+    res = client.call(ServiceDescription(service, [int], int), [5], JsonSerializer());
     print(res)

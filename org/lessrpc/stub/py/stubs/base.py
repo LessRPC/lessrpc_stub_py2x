@@ -16,8 +16,7 @@ class Stub():
     def __init__(self, serializers = []):
         self.__serializers = serializers
         self.__serializer_map = {}
-        self.__accepted_type_string = None
-        
+
         hasjson = False
         
         # intialize serializers map
@@ -40,15 +39,21 @@ class Stub():
         return self.__serializers
     
     
-    def get_accepted_types(self):
-        if self.__accepted_type_string is None:
-            txt = ""
-            for serializer in self.__serializers:
-                if len(txt) > 0:
-                    txt = txt + " , "
-                txt = txt + serializer.get_type().http_format()
-            self.__accepted_type_string = txt
-        return self.__accepted_type_string;
+    def get_accepted_types(self, accept=None):
+        
+        if accept is None:
+            accept = []
+            for s in self.get_serializers():
+                accept.append(s.get_type())
+                
+                
+        txt = ""
+        for frmt in accept:
+            if len(txt) > 0:
+                txt = txt + " , "
+            txt = txt + frmt.http_format()
+        
+        return txt;
     
 
     def get_random_id(self):
