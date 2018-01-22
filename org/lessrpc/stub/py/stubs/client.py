@@ -24,6 +24,7 @@ from org.lessrpc.common.py.services import NameServerServices, \
     NameServerFunctions
 from org.lessrpc.stub.py.cache import NoCache, SimpleCache
 from org.lessrpc.stub.py.errors import NoProviderAvailableException
+import traceback
 
 
 
@@ -85,6 +86,7 @@ class ClientStub(Stub):
         except ParseException:
             raise
         except :
+            traceback.print_exc();
             raise
         return result.content
     
