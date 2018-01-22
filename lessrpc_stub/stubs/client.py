@@ -3,27 +3,27 @@ Created on Nov 7, 2017
 
 @author: Salim
 '''
-from lessrpc.stub.stubs.base import Stub
-from lessrpc.stub.StubConstants import LESS_RPC_REQUEST_PING, LESS_RPC_REQUEST_INFO, LESS_RPC_REQUEST_SERVICE, LESS_RPC_REQUEST_EXECUTE, HTTP_WAIT_TIME_SHORT, HTTP_WAIT_TIME_LONG
+from lessrpc_stub.stubs.base import Stub
+from lessrpc_stub.StubConstants import LESS_RPC_REQUEST_PING, LESS_RPC_REQUEST_INFO, LESS_RPC_REQUEST_SERVICE, LESS_RPC_REQUEST_EXECUTE, HTTP_WAIT_TIME_SHORT, HTTP_WAIT_TIME_LONG
 import httplib
-from lessrpc.common.errors.less import ResponseContentTypeCannotBePrasedException, \
+from lessrpc_common.errors.less import ResponseContentTypeCannotBePrasedException, \
     SerializationFormatNotSupported, ApplicationSpecificErrorException, \
     RPCProviderFailureException, ServiceProviderNotAvailable
-from lessrpc.common.info.basic import SerializationFormat, ServiceInfo, \
+from lessrpc_common.info.basic import SerializationFormat, ServiceInfo, \
     EnvironmentInfo, ServiceLocator, ServiceDescription
-from lessrpc.common.errors.lessrpc import RPCException
-from lessrpc.common.info.response import TextResponse, IntegerResponse, \
+from lessrpc_common.errors.lessrpc import RPCException
+from lessrpc_common.info.response import TextResponse, IntegerResponse, \
     ProviderInfoResponse, ServiceSupportResponse, ExecuteRequestResponse
 from pylods.error import ParseException
 from io import BytesIO
-from lessrpc.stub.serializer import JsonSerializer
-from lessrpc.common.info.request import ServiceRequest
+from lessrpc_stub.serializer import JsonSerializer
+from lessrpc_common.info.request import ServiceRequest
 from httpoutputsteam.stream import HttpBufferedOutstream
 from pylods.deserialize import DeserializationContext
-from lessrpc.common.services import NameServerServices, \
+from lessrpc_common.services import NameServerServices, \
     NameServerFunctions
-from lessrpc.stub.cache import NoCache, SimpleCache
-from lessrpc.stub.errors import NoProviderAvailableException
+from lessrpc_stub.cache import NoCache, SimpleCache
+from lessrpc_stub.errors import NoProviderAvailableException
 import traceback
 
 

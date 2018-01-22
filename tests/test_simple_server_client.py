@@ -1,14 +1,14 @@
 
 import unittest
-from lessrpc.common.info.basic import EnvironmentInfo, \
+from lessrpc_common.info.basic import EnvironmentInfo, \
     ServiceProviderInfo, SerializationFormat, ServiceInfo, ServiceSupportInfo, \
     ServiceDescription
-from lessrpc.common.errors.less import ServiceNotSupportedException
-from lessrpc.common.services import ServiceProvider
-from lessrpc.stub.stubs.server import ServerStub
+from lessrpc_common.errors.less import ServiceNotSupportedException
+from lessrpc_common.services import ServiceProvider
+from lessrpc_stub.stubs.server import ServerStub
 import threading
-from lessrpc.stub.stubs.client import ClientStub
-from lessrpc.stub.serializer import JsonSerializer
+from lessrpc_stub.stubs.client import ClientStub
+from lessrpc_stub.serializer import JsonSerializer
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

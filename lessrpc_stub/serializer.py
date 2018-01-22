@@ -3,8 +3,8 @@ Created on Nov 7, 2017
 
 @author: Salim
 '''
-from lessrpc.common.serialize import Serializer
-from lessrpc.common.info.basic import SerializationFormat
+from lessrpc_common.serialize import Serializer
+from lessrpc_common.info.basic import SerializationFormat
 from pylodsjson.pylodsjson import JsonObjectMapper, JsonParser
 from pylods.deserialize import DeserializationContext
 

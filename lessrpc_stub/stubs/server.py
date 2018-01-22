@@ -12,20 +12,20 @@ from io import BytesIO
 import cherrypy
 
 
-from lessrpc.common.types import StatusType
-from lessrpc.common.info.basic import SerializationFormat, \
+from lessrpc_common.types import StatusType
+from lessrpc_common.info.basic import SerializationFormat, \
      ServiceInfo, ServiceLocator
-from lessrpc.common.errors.less import AcceptTypeHTTPFormatNotParsable, \
+from lessrpc_common.errors.less import AcceptTypeHTTPFormatNotParsable, \
     AcceptTypeNotSupported, WrongHTTPMethodException, ContentTypeNotSupported, \
     ContentTypeHTTPFormatNotParsable, ServiceNotSupportedException
-from lessrpc.common.info.response import TextResponse, IntegerResponse, \
+from lessrpc_common.info.response import TextResponse, IntegerResponse, \
     ProviderInfoResponse, ServiceSupportResponse, ExecuteRequestResponse, ServiceResponse     
-from lessrpc.common.info.request import ServiceRequest
+from lessrpc_common.info.request import ServiceRequest
 
-from lessrpc.stub.stubs.base import Stub
-from lessrpc.common.errors.lessrpc import ServerStubNotInitialized
+from lessrpc_stub.stubs.base import Stub
+from lessrpc_common.errors.lessrpc import ServerStubNotInitialized
 from pylods.deserialize import DeserializationContext
-from lessrpc.stub.stubs.client import NSClient
+from lessrpc_stub.stubs.client import NSClient
 
 
 
