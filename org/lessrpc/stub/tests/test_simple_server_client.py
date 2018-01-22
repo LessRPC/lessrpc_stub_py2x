@@ -128,6 +128,14 @@ class TestServerClient(unittest.TestCase):
         res = client.call(desc, ServiceProviderInfo("localhost", 4342, EnvironmentInfo.current_env_info()), [1, 2], JsonSerializer())
         
         self.assertEquals(res, res)
+        
+        
+    def test_execute_choose_format(self):
+        client = ClientStub([]);
+        desc = ServiceDescription(ServiceInfo('test', 1), [int, int], int) 
+        res = client.call(desc, ServiceProviderInfo("localhost", 4342, EnvironmentInfo.current_env_info()), [1, 2], JsonSerializer(), accept=[SerializationFormat.default_format()])
+        
+        self.assertEquals(res, res)
     
     def test_execute_clspath(self):
         client = ClientStub([]);
