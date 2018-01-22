@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
   name = 'lessrpc_stub',
-  packages = ['lessrpc_stub'], # this must be the same as the name above
+  packages = ['lessrpc_stub','lessrpc_stub.stubs'], # this must be the same as the name above
   version = '1.0.4',
   description = 'Less RPC stubs project',
   author = 'Salim Malakouti',
