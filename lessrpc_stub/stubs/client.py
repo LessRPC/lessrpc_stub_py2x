@@ -3,7 +3,7 @@ Created on Nov 7, 2017
 
 @author: Salim
 '''
-from lessrpc_stub.stubs.base import Stub
+from lessrpc_stub.stubs.base import Stub, OutBase64Wrapper, InBase64Wrapper
 from lessrpc_stub.StubConstants import LESS_RPC_REQUEST_PING, LESS_RPC_REQUEST_INFO, LESS_RPC_REQUEST_SERVICE, LESS_RPC_REQUEST_EXECUTE, HTTP_WAIT_TIME_SHORT, HTTP_WAIT_TIME_LONG
 import httplib
 from lessrpc_common.errors.less import ResponseContentTypeCannotBePrasedException, \
@@ -25,12 +25,10 @@ from lessrpc_common.services import NameServerServices, \
 from lessrpc_stub.cache import NoCache, SimpleCache
 from lessrpc_stub.errors import NoProviderAvailableException
 import traceback
+import base64
 
 
 
-class X():
-    
-    pass
 
 
 class ClientStub(Stub):
@@ -66,9 +64,10 @@ class ClientStub(Stub):
             conn.endheaders()
             
             # create an outputstream for http connection
-            out = HttpBufferedOutstream(conn)
-            serializer.serialize(request, ServiceRequest, out)
-            out.flush();
+            out= HttpBufferedOutstream(conn)
+            b64 = OutBase64Wrapper(out)
+            serializer.serialize(request, ServiceRequest, b64)
+            b64.flush()
             out.close()
             
             # read response
@@ -159,7 +158,7 @@ class ClientStub(Stub):
         
         
         try:
-            out = BytesIO()
+            out = OutBase64Wrapper(BytesIO())
             serializer.serialize(service, ServiceInfo, out)
             length = out.tell()
             out.seek(0)
@@ -221,7 +220,7 @@ class ClientStub(Stub):
 
         # status is OK so read response
         try:
-            return serializer.deserialize(response, cls, ctxt=ctxt);
+            return serializer.deserialize(InBase64Wrapper(response), cls, ctxt=ctxt);
         except:
             raise 
         
@@ -233,7 +232,7 @@ class ClientStub(Stub):
         :param serializer: the serialize to prarse content type
         :return TextResponse instance
         '''
-        return serializer.deserialize(response, TextResponse);
+        return serializer.deserialize(InBase64Wrapper(response), TextResponse);
     
     
     
