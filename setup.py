@@ -12,6 +12,6 @@ setup(
   download_url = 'https://github.com/LessRPC/lessrpc_stub_py2x/archive/1.0.6.tar.gz', # I'll explain this in a second
   keywords = ['python','serialization','deserialization','rpc','rmi','less rpc', 'client', 'server'], # arbitrary keywords
   classifiers = ['Programming Language :: Python :: 2.7'],
-  install_requires=['pylods','pylods-json', 'httplib','httpoutputsteam','cherrypy','enum34' ],
+  install_requires=['pylods','pylods-json','httpoutputsteam','cherrypy','enum34' ],
   python_requires='~=2.7'
 )
