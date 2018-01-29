@@ -18,7 +18,7 @@ from pylods.error import ParseException
 from io import BytesIO
 from lessrpc_stub.serializer import JsonSerializer
 from lessrpc_common.info.request import ServiceRequest
-from httpoutputsteam.stream import HttpBufferedOutstream
+from httpoutputstream.stream import HttpBufferedOutstream
 from pylods.deserialize import DeserializationContext
 from lessrpc_common.services import NameServerServices, \
     NameServerFunctions
