@@ -83,32 +83,23 @@ class InBase64Wrapper():
      
     def read(self, size=-1):
         
-        if size != -1:
-            needsize = (size - len(self.cache))
-            needsize = int(round((needsize / 3)) * 4 + min(round((needsize % 3)), 1) * 4)
+        data = self.instream.read(size)
+        finished = len(data) < size or size == -1
+        
+        if finished:
+            return base64.b64decode(self.cache + data)
         else:
-            needsize = -1
-
-#         print("needsize: "+str(needsize))
+            idx = data.rfind('\n')
+            idx = max(idx, data.rfind('='))
+            if idx > -1:
+                out = base64.b64decode(self.cache + data[0:idx])
+                self.cache = data[idx:]
+                return out
+            else:
+                self.cache = self.cache + data
         
-        readsize = 0;
-        data = ''
         
-        if needsize > 0 or needsize == -1:
-            data = self.instream.read(needsize)
-            data = base64.b64decode(data)
-            readsize = len(data)
         
-        if size == -1:
-            requestsize = len(self.cache) + readsize
-        else:
-            requestsize = size
-        
-#         print("---- cache: "+self.cache+"  l:"+str(len(self.cache)))
-        out = self.cache[0:min(requestsize, len(self.cache))] + data[0:max(0, (requestsize - len(self.cache)))]
-        self.cache = self.cache[max(requestsize, len(self.cache)):len(self.cache)] + data[max(0, (requestsize - len(self.cache))):readsize]
-#         print("---- cache: "+self.cache+"  l:"+str(len(self.cache)))
-        return out
     
     def close(self):
         self.instream.close()
@@ -145,10 +136,10 @@ class OutBase64Wrapper():
 # out = BytesIO()
 # out.write(base64.b64encode("test-ts-xx-yyy-zzzz-mmmmm"))
 # out.seek(0)
-# 
+# # 
 # b64= InBase64Wrapper(out)
 # 
-# print(b64.read(1))
+# print(b64.read(2))
 # print(b64.read(4))
 # print(b64.read(1))
 # print(b64.read(10))
