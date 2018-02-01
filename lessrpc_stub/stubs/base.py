@@ -11,7 +11,7 @@ import base64
 from _io import BytesIO
 
 
-DO_BASE64 = False
+
 
 
 
@@ -80,15 +80,16 @@ class Stub():
  
 class InBase64Wrapper():
     
-    
+    DO_BASE64 = False
     
     def __init__(self, instream):
         self.instream = instream
         self.cache = ''
         
+        
      
     def read(self, size=-1):
-        if DO_BASE64 :
+        if self.DO_BASE64 :
         
             data = self.instream.read(size)
             finished = len(data) < size or size == -1
@@ -115,6 +116,8 @@ class InBase64Wrapper():
 class OutBase64Wrapper():
     
     
+    DO_BASE64 = False
+    
     def __init__(self, outstream):
         self.outstream = outstream
         self.cache = ''
@@ -122,7 +125,7 @@ class OutBase64Wrapper():
 
     
     def write(self, data):
-        if DO_BASE64 :
+        if self.DO_BASE64 :
             size = len(data) + len(self.cache)
             sizetowrite = int(round(size / 3))*3
             fromcache = min(sizetowrite, len(self.cache))
@@ -135,7 +138,7 @@ class OutBase64Wrapper():
 
     
     def flush(self):
-        if DO_BASE64 :
+        if self.DO_BASE64 :
             if len(self.cache) > 0:
                 self.outstream.write(base64.b64encode(self.cache))
                 self.outstream.flush()
