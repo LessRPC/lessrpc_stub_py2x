@@ -75,7 +75,34 @@ class Stub():
     serializers = property(get_serializers)
     
     
+class BodyWrapper():
     
+    def __init__(self, body): 
+        self.body = body
+        self.cache = None
+        
+        
+    def read(self, size=None):
+        
+            
+        if size is not None and size == 0:
+            if self.cache is None:
+                self.cache = self.body.read(1)
+            else:
+                self.cache = self.cache + self.body.read(1)  
+            return self.cache[0:0]
+        else:
+            data = None
+            if size is None:
+                data = self.body.read()
+            else:
+                data = self.body.read(size)
+            
+            if self.cache is not None:
+                data = self.cache + data;
+                self.cache = None
+            
+            return data    
     
  
 class InBase64Wrapper():
@@ -148,6 +175,7 @@ class OutBase64Wrapper():
     def close(self):
         self.flush()
         self.outstream.close()
+    
     
 
 # out = BytesIO()

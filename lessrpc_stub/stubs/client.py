@@ -3,7 +3,7 @@ Created on Nov 7, 2017
 
 @author: Salim
 '''
-from lessrpc_stub.stubs.base import Stub
+from lessrpc_stub.stubs.base import Stub, BodyWrapper
 from lessrpc_stub.StubConstants import LESS_RPC_REQUEST_PING, LESS_RPC_REQUEST_INFO, LESS_RPC_REQUEST_SERVICE, LESS_RPC_REQUEST_EXECUTE, HTTP_WAIT_TIME_SHORT, HTTP_WAIT_TIME_LONG
 import httplib
 from lessrpc_common.errors.less import ResponseContentTypeCannotBePrasedException, \
@@ -187,7 +187,7 @@ class ClientStub(Stub):
                 'POST',
                 "http://" + str(spInfo.url) + ":" + str(spInfo.port) + LESS_RPC_REQUEST_SERVICE,
                 preload_content=False,
-                body=out,
+                body=out.getvalue(),
                 timeout=timeout,
                 headers=headers)
             
@@ -235,7 +235,7 @@ class ClientStub(Stub):
 
         # status is OK so read response
         try:
-            return serializer.deserialize(response, cls, ctxt=ctxt);
+            return serializer.deserialize(BodyWrapper(response), cls, ctxt=ctxt);
 #             return serializer.deserialize(InBase64Wrapper(response), cls, ctxt=ctxt);
         except:
             raise 

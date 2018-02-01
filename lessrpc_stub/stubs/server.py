@@ -22,7 +22,7 @@ from lessrpc_common.info.response import TextResponse, IntegerResponse, \
     ProviderInfoResponse, ServiceSupportResponse, ExecuteRequestResponse, ServiceResponse     
 from lessrpc_common.info.request import ServiceRequest
 
-from lessrpc_stub.stubs.base import Stub, InBase64Wrapper, OutBase64Wrapper
+from lessrpc_stub.stubs.base import Stub, BodyWrapper
 from lessrpc_common.errors.lessrpc import ServerStubNotInitialized
 from pylods.deserialize import DeserializationContext
 from lessrpc_stub.stubs.client import NSClient
@@ -30,34 +30,6 @@ from lessrpc_stub.stubs.client import NSClient
 
 
 
-class BodyWrapper():
-    
-    def __init__(self, body): 
-        self.body = body
-        self.cache = None
-        
-        
-    def read(self, size=None):
-        
-            
-        if size is not None and size == 0:
-            if self.cache is None:
-                self.cache = self.body.read(1)
-            else:
-                self.cache = self.cache + self.body.read(1)  
-            return self.cache[0:0]
-        else:
-            data = None
-            if size is None:
-                data = self.body.read()
-            else:
-                data = self.body.read(size)
-            
-            if self.cache is not None:
-                data = self.cache + data;
-                self.cache = None
-            
-            return data
             
             
 
@@ -92,9 +64,9 @@ class ServerStubHandler():
         
         try:
             out = BytesIO()
-            b64 = OutBase64Wrapper(out)
-            respserializer.serialize(IntegerResponse(StatusType.OK.value, (1 if self.provider.ping() else 0)), IntegerResponse, b64)
-            b64.flush()
+#             out = OutBase64Wrapper(out)
+            respserializer.serialize(IntegerResponse(StatusType.OK.value, (1 if self.provider.ping() else 0)), IntegerResponse, out)
+            out.flush()
             out.seek(0)
             return out
         except:
@@ -114,9 +86,9 @@ class ServerStubHandler():
               
         try:              
             out = BytesIO()
-            b64= OutBase64Wrapper(out)
-            respserializer.serialize(ProviderInfoResponse(StatusType.OK.value, self.provider.info()), ProviderInfoResponse, b64)
-            b64.flush()
+#             b64 = OutBase64Wrapper(out)
+            respserializer.serialize(ProviderInfoResponse(StatusType.OK.value, self.provider.info()), ProviderInfoResponse, out)
+            out.flush()
             out.seek(0)        
             return out
         except:
@@ -133,7 +105,9 @@ class ServerStubHandler():
             return status
         
         try:
-            service = reqserializer.deserialize(InBase64Wrapper(BodyWrapper(cherrypy.request.body)), ServiceInfo)
+#             out = InBase64Wrapper(BodyWrapper(cherrypy.request.body))
+            out = BodyWrapper(cherrypy.request.body)
+            service = reqserializer.deserialize(out, ServiceInfo)
         except:
             traceback.print_exc()
             return self.prepare_status(StatusType.SERIALIZATION_ERROR, respserializer.get_type())
@@ -146,9 +120,9 @@ class ServerStubHandler():
 #           
         try:    
             out = BytesIO()
-            b64 = OutBase64Wrapper(out)
-            respserializer.serialize(ServiceSupportResponse(StatusType.OK.value, sup), ServiceSupportResponse, b64)
-            b64.flush()
+#             b64 = OutBase64Wrapper(out)
+            respserializer.serialize(ServiceSupportResponse(StatusType.OK.value, sup), ServiceSupportResponse, out)
+            out.flush()
             out.seek(0)        
             return out
         except:
@@ -166,7 +140,9 @@ class ServerStubHandler():
             return status
         
         try:
-            request = reqserializer.deserialize(InBase64Wrapper(BodyWrapper(cherrypy.request.body)), ServiceRequest, ctxt=DeserializationContext.create_context([("CLSLOCATOR", ServiceLocator.create(self.provider.list_services()))]))
+#             out=InBase64Wrapper(BodyWrapper(cherrypy.request.body))
+            out = BodyWrapper(cherrypy.request.body)
+            request = reqserializer.deserialize(out, ServiceRequest, ctxt=DeserializationContext.create_context([("CLSLOCATOR", ServiceLocator.create(self.provider.list_services()))]))
         except:
             traceback.print_exc();
             return self.prepare_status(StatusType.SERIALIZATION_ERROR, respserializer.get_type())
@@ -183,9 +159,9 @@ class ServerStubHandler():
             return self.prepare_status(StatusType.INTERNAL_ERROR, respserializer.get_type())
         try:
             out = BytesIO()
-            b64 = OutBase64Wrapper(out)
-            respserializer.serialize(ExecuteRequestResponse(StatusType.OK.value, ServiceResponse(request.service, result, request.requestid)), ExecuteRequestResponse, b64)
-            b64.flush()
+#             b64 = OutBase64Wrapper(out)
+            respserializer.serialize(ExecuteRequestResponse(StatusType.OK.value, ServiceResponse(request.service, result, request.requestid)), ExecuteRequestResponse, out)
+            out.flush()
             out.seek(0)
             return out
         except:
@@ -305,9 +281,9 @@ class ServerStubHandler():
         serializer = self.stub.get_serializer(frmt)
 
         out = BytesIO()        
-        b64=OutBase64Wrapper(out)
-        serializer.serialize(TextResponse(status.value, content), TextResponse, b64)
-        b64.flush()
+#         b64 = OutBase64Wrapper(out)
+        serializer.serialize(TextResponse(status.value, content), TextResponse, out)
+        out.flush()
         return out.getvalue()
         
         
