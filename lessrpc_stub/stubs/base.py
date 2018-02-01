@@ -10,6 +10,12 @@ from lessrpc_stub.serializer import JsonSerializer
 import base64
 from _io import BytesIO
 
+
+DO_BASE64 = False
+
+
+
+
 class Stub():
     
     __slots__ = ['__serializers', '__serializer_map', '__accepted_type_string']
@@ -82,23 +88,24 @@ class InBase64Wrapper():
         
      
     def read(self, size=-1):
+        if DO_BASE64 :
         
-        data = self.instream.read(size)
-        finished = len(data) < size or size == -1
-        
-        if finished:
-            return base64.b64decode(self.cache + data)
-        else:
-            idx = data.rfind('\n')
-            idx = max(idx, data.rfind('='))
-            if idx > -1:
-                out = base64.b64decode(self.cache + data[0:idx])
-                self.cache = data[idx:]
-                return out
+            data = self.instream.read(size)
+            finished = len(data) < size or size == -1
+            
+            if finished:
+                return base64.b64decode(self.cache + data)
             else:
-                self.cache = self.cache + data
-        
-        
+                idx = data.rfind('\n')
+                idx = max(idx, data.rfind('='))
+                if idx > -1:
+                    out = base64.b64decode(self.cache + data[0:idx])
+                    self.cache = data[idx:]
+                    return out
+                else:
+                    self.cache = self.cache + data
+        else:
+            return self.instream.read(size)
         
     
     def close(self):
@@ -115,21 +122,28 @@ class OutBase64Wrapper():
 
     
     def write(self, data):
-        size = len(data) + len(self.cache)
-        sizetowrite = int(round(size / 3))*3
-        fromcache = min(sizetowrite, len(self.cache))
-        out = self.cache[0:fromcache] + data[0:(sizetowrite - fromcache)]
-        self.cache = self.cache[fromcache:len(self.cache)] + data[(sizetowrite - fromcache):len(data)]
-        self.outstream.write(base64.b64encode(out))
+        if DO_BASE64 :
+            size = len(data) + len(self.cache)
+            sizetowrite = int(round(size / 3))*3
+            fromcache = min(sizetowrite, len(self.cache))
+            out = self.cache[0:fromcache] + data[0:(sizetowrite - fromcache)]
+            self.cache = self.cache[fromcache:len(self.cache)] + data[(sizetowrite - fromcache):len(data)]
+            self.outstream.write(base64.b64encode(out))
+        else:
+            self.outstream.write(data)
         
 
     
     def flush(self):
-        if len(self.cache) > 0:
-            self.outstream.write(base64.b64encode(self.cache))
+        if DO_BASE64 :
+            if len(self.cache) > 0:
+                self.outstream.write(base64.b64encode(self.cache))
+                self.outstream.flush()
+        else:
             self.outstream.flush()
     
     def close(self):
+        self.flush()
         self.outstream.close()
     
 
