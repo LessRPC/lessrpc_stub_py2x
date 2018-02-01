@@ -3,7 +3,7 @@ Created on Nov 7, 2017
 
 @author: Salim
 '''
-from lessrpc_stub.stubs.base import Stub, OutBase64Wrapper, InBase64Wrapper
+from lessrpc_stub.stubs.base import Stub
 from lessrpc_stub.StubConstants import LESS_RPC_REQUEST_PING, LESS_RPC_REQUEST_INFO, LESS_RPC_REQUEST_SERVICE, LESS_RPC_REQUEST_EXECUTE, HTTP_WAIT_TIME_SHORT, HTTP_WAIT_TIME_LONG
 import httplib
 from lessrpc_common.errors.less import ResponseContentTypeCannotBePrasedException, \
@@ -12,20 +12,21 @@ from lessrpc_common.errors.less import ResponseContentTypeCannotBePrasedExceptio
 from lessrpc_common.info.basic import SerializationFormat, ServiceInfo, \
     EnvironmentInfo, ServiceLocator, ServiceDescription
 from lessrpc_common.errors.lessrpc import RPCException
-from lessrpc_common.info.response import TextResponse, IntegerResponse, \
-    ProviderInfoResponse, ServiceSupportResponse, ExecuteRequestResponse
+from lessrpc_common.info.response import TextResponse, \
+    ProviderInfoResponse, ServiceSupportResponse, ExecuteRequestResponse,\
+    IntegerResponse
 from pylods.error import ParseException
 from io import BytesIO
 from lessrpc_stub.serializer import JsonSerializer
 from lessrpc_common.info.request import ServiceRequest
-from httpoutputstream.stream import HttpBufferedOutstream
 from pylods.deserialize import DeserializationContext
 from lessrpc_common.services import NameServerServices, \
     NameServerFunctions
 from lessrpc_stub.cache import NoCache, SimpleCache
 from lessrpc_stub.errors import NoProviderAvailableException
 import traceback
-import base64
+import urllib3
+
 
 
 
@@ -54,28 +55,34 @@ class ClientStub(Stub):
         result = None
         
         try:
-            headers = {'Accept': self.get_accepted_types(accept), 'Content-Type':serializer.get_type().http_format(), 'Transfer-Encoding': 'chunked'}
-            
+            headers = {'Accept': self.get_accepted_types(accept), 'Content-Type':serializer.get_type().http_format()}
+
+            out = BytesIO();
+            serializer.serialize(request, ServiceRequest, out)
+            out.seek(0)
             # http connection
-            conn = httplib.HTTPConnection(str(spInfo.url) + ":" + str(spInfo.port), timeout=timeout)
-            conn.putrequest("POST", LESS_RPC_REQUEST_EXECUTE)
-            for hdr, value in headers.iteritems():
-                conn.putheader(hdr, value)
-            conn.endheaders()
+            http = urllib3.PoolManager()
+            req = http.request(
+                'POST',
+                "http://" + str(spInfo.url) + ":" + str(spInfo.port) + LESS_RPC_REQUEST_EXECUTE,
+                preload_content=False,
+                body=out.getvalue(),
+                timeout=timeout,
+                headers=headers)
             
             # create an outputstream for http connection
-            out= HttpBufferedOutstream(conn)
-            b64 = OutBase64Wrapper(out)
-            serializer.serialize(request, ServiceRequest, b64)
-            b64.flush()
-            out.close()
+#             out= HttpBufferedOutstream(conn)
+#             b64 = OutBase64Wrapper(out)
+#             serializer.serialize(request, ServiceRequest, b64)
+#             b64.flush()
+#             out.close()
             
             # read response
-            response = conn.getresponse()
+#             response = conn.getresponse()
             
             ctxt = DeserializationContext.create_context([("CLSLOCATOR", ServiceLocator.create([desc]))])
-            result = self._read_response(response, ExecuteRequestResponse, ctxt)
-            conn.close()
+            result = self._read_response(req, ExecuteRequestResponse, ctxt)
+            
         except ResponseContentTypeCannotBePrasedException:
             raise
         except SerializationFormatNotSupported :
@@ -102,11 +109,17 @@ class ClientStub(Stub):
         
         headers = {'Accept': self.get_accepted_types([SerializationFormat.default_format()])}
         try:
-            conn = httplib.HTTPConnection(str(spInfo.url) + ":" + str(spInfo.port), timeout=timeout)
-            conn.request("GET", LESS_RPC_REQUEST_PING, headers=headers)
-            response = conn.getresponse()
-            ping = self._read_response(response, IntegerResponse)
-            conn.close()
+
+            # http connection
+            http = urllib3.PoolManager()
+            req = http.request(
+                'GET',
+                "http://" + str(spInfo.url) + ":" + str(spInfo.port) + LESS_RPC_REQUEST_PING,
+            preload_content=False,
+            timeout=timeout,
+            headers=headers)
+        
+            ping = self._read_response(req, IntegerResponse)
         except ResponseContentTypeCannotBePrasedException:
             raise
         except SerializationFormatNotSupported :
@@ -132,17 +145,21 @@ class ClientStub(Stub):
              :param port:
              :return instance of ServiceProivderInfo
         '''
-        info = None
         
         headers = {'Accept': self.get_accepted_types([SerializationFormat.default_format()])}
-        try:
-            conn = httplib.HTTPConnection(url + ":" + str(port), timeout=timeout)
-            conn.request("GET", LESS_RPC_REQUEST_INFO, headers=headers)
-            response = conn.getresponse()
-            info = self._read_response(response, ProviderInfoResponse)
-            conn.close()
-        except Exception:
-            raise 
+        
+
+        # http connection
+        http = urllib3.PoolManager()
+        req = http.request(
+            'GET',
+            "http://" + str(url) + ":" + str(port) + LESS_RPC_REQUEST_INFO,
+            preload_content=False,
+            timeout=timeout,
+            headers=headers)
+        
+        info = self._read_response(req, ProviderInfoResponse)
+            
             
         return info.content;
         
@@ -154,30 +171,27 @@ class ClientStub(Stub):
         :param service: ServiceInfo:
         :return ServiceSupportInfo
         '''
-        serializer = self.get_serializer(SerializationFormat.default_format());
         
-        
-        try:
-            out = OutBase64Wrapper(BytesIO())
+            
+        try:            
+            serializer = self.get_serializer(SerializationFormat.default_format());
+    
+            out = BytesIO();
             serializer.serialize(service, ServiceInfo, out)
-            length = out.tell()
             out.seek(0)
             
-            headers = {'Accept': self.get_accepted_types([SerializationFormat.default_format()]), 'Content-Type':serializer.get_type().http_format(), 'Content-Length': length}
-            
+            headers = {'Accept': self.get_accepted_types([SerializationFormat.default_format()]), 'Content-Type':serializer.get_type().http_format(), 'Content-Length': len(out.getvalue())}
             # http connection
-            conn = httplib.HTTPConnection(str(spInfo.url) + ":" + str(spInfo.port), timeout=timeout)
-            conn.putrequest("POST", LESS_RPC_REQUEST_SERVICE)
-            for hdr, value in headers.iteritems():
-                conn.putheader(hdr, value)
-            conn.endheaders()
-            conn.send(out)
-            # send results as stream
+            http = urllib3.PoolManager()
+            req = http.request(
+                'POST',
+                "http://" + str(spInfo.url) + ":" + str(spInfo.port) + LESS_RPC_REQUEST_SERVICE,
+                preload_content=False,
+                body=out,
+                timeout=timeout,
+                headers=headers)
             
-            
-            response = conn.getresponse()
-            support = self._read_response(response, ServiceSupportResponse)
-            conn.close()
+            support = self._read_response(req, ServiceSupportResponse)
         except Exception:
             raise 
         
@@ -187,16 +201,17 @@ class ClientStub(Stub):
     def _read_response(self, response, cls, ctxt=DeserializationContext.create_context()):
         
         # TODO handle response status
-        if response.msg is None or response.msg.gettype() is None or len(response.msg.gettype()) < 1:
+        if response.headers is None or response.headers['content-type'] is None or len(response.headers['content-type']) < 1:
             raise ResponseContentTypeCannotBePrasedException(response.msg.gettype())
             return  # TODO send error
         
-        contenttype = response.msg.gettype() + " ;" + " ; ".join(response.msg.getplist())
+#         contenttype = response.headers['content-type']+ " ;" + " ; ".join(response.msg.getplist())
+        contenttype =  response.headers['content-type']
             
         # read format
         frmt = None
         try:
-            frmt = SerializationFormat.parse_http_format(" ; ".join(response.msg.getplist()))
+            frmt = SerializationFormat.parse_http_format(contenttype)
         except :
             raise ResponseContentTypeCannotBePrasedException(contenttype);
         
@@ -220,7 +235,8 @@ class ClientStub(Stub):
 
         # status is OK so read response
         try:
-            return serializer.deserialize(InBase64Wrapper(response), cls, ctxt=ctxt);
+            return serializer.deserialize(response, cls, ctxt=ctxt);
+#             return serializer.deserialize(InBase64Wrapper(response), cls, ctxt=ctxt);
         except:
             raise 
         
@@ -232,7 +248,8 @@ class ClientStub(Stub):
         :param serializer: the serialize to prarse content type
         :return TextResponse instance
         '''
-        return serializer.deserialize(InBase64Wrapper(response), TextResponse);
+#         return serializer.deserialize(InBase64Wrapper(response), TextResponse);
+        return serializer.deserialize(response, TextResponse);
     
     
     

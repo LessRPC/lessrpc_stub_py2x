@@ -126,7 +126,7 @@ class TestServerClient(unittest.TestCase):
         client = ClientStub([]);
         desc = ServiceDescription(ServiceInfo('test', 1), [int, int], int) 
         res = client.call(desc, ServiceProviderInfo("localhost", 4342, EnvironmentInfo.current_env_info()), [1, 2], JsonSerializer())
-        
+#         
         self.assertEquals(res, res)
         
         
@@ -134,7 +134,7 @@ class TestServerClient(unittest.TestCase):
         client = ClientStub([JsonSerializer()]);
         desc = ServiceDescription(ServiceInfo('test', 1), [int, int], int) 
         res = client.call(desc, ServiceProviderInfo("localhost", 4342, EnvironmentInfo.current_env_info()), [1, 2], JsonSerializer(), accept=[SerializationFormat("MSGPACK", "2.0")])
-        
+#         
         self.assertEquals(res, res)
     
     def test_execute_clspath(self):
