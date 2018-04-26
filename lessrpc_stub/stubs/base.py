@@ -8,7 +8,6 @@ import random
 from datetime import datetime
 from lessrpc_stub.serializer import JsonSerializer
 import base64
-from _io import BytesIO
 
 
 
@@ -83,8 +82,6 @@ class BodyWrapper():
         
         
     def read(self, size=None):
-        
-            
         if size is not None and size == 0:
             if self.cache is None:
                 self.cache = self.body.read(1)
@@ -97,11 +94,9 @@ class BodyWrapper():
                 data = self.body.read()
             else:
                 data = self.body.read(size)
-            
             if self.cache is not None:
                 data = self.cache + data;
                 self.cache = None
-            
             return data    
     
  
@@ -176,33 +171,3 @@ class OutBase64Wrapper():
         self.flush()
         self.outstream.close()
     
-    
-
-# out = BytesIO()
-# out.write(base64.b64encode("test-ts-xx-yyy-zzzz-mmmmm"))
-# out.seek(0)
-# # 
-# b64= InBase64Wrapper(out)
-# 
-# print(b64.read(2))
-# print(b64.read(4))
-# print(b64.read(1))
-# print(b64.read(10))
-# print(b64.read(7))
-# print(b64.read(1))
-# print(b64.read(1))
-
-
-
-
-# out = BytesIO()
-# # 
-# b64 = OutBase64Wrapper(out)
-# b64.write("1234"); print(out.getvalue())
-# b64.write("5"); print(out.getvalue())
-# b64.write("67"); print(out.getvalue())
-# b64.write(""); print(out.getvalue())
-# b64.flush(); print(out.getvalue())
-
-
-#

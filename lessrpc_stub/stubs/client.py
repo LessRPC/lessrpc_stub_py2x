@@ -38,11 +38,9 @@ class ClientStub(Stub):
         Stub.__init__(self, serializers)
         
         
-        
-    
+            
     def call(self, desc, spInfo, args, serializer, timeout=HTTP_WAIT_TIME_LONG, accept=None):
-        '''
-        
+        '''        
         :param service: ServiceInfo
         :param spInfo: ServiceProviderInfo 
         :param args: array of arguments as any kind of object
@@ -50,10 +48,8 @@ class ClientStub(Stub):
         :return ServiceResponse: 
         '''
         
-        request = ServiceRequest.create(desc.info, EnvironmentInfo.current_env_info() , self.get_random_id(), args)
-        
-        result = None
-        
+        request = ServiceRequest.create(desc.info, EnvironmentInfo.current_env_info() , self.get_random_id(), args)        
+        result = None        
         try:
             headers = {'Accept': self.get_accepted_types(accept), 'Content-Type':serializer.get_type().http_format()}
 
@@ -69,16 +65,6 @@ class ClientStub(Stub):
                 body=out.getvalue(),
                 timeout=timeout,
                 headers=headers)
-            
-            # create an outputstream for http connection
-#             out= HttpBufferedOutstream(conn)
-#             b64 = OutBase64Wrapper(out)
-#             serializer.serialize(request, ServiceRequest, b64)
-#             b64.flush()
-#             out.close()
-            
-            # read response
-#             response = conn.getresponse()
             
             ctxt = DeserializationContext.create_context([("CLSLOCATOR", ServiceLocator.create([desc]))])
             result = self._read_response(req, ExecuteRequestResponse, ctxt)
@@ -232,7 +218,6 @@ class ClientStub(Stub):
                 raise ApplicationSpecificErrorException(error.status, error.content);
             else:
                 raise RPCException(error.status, error.content);
-
         # status is OK so read response
         try:
             return serializer.deserialize(BodyWrapper(response), cls, ctxt=ctxt);
@@ -450,116 +435,5 @@ class NSClientStub(ClientStub):
     
     ns = property(__get_ns)
     cache = property(__get_cache)  
-    nsinfo = property(__get_nsinfo)      
-            
-# c = ClientStub()
-# 
-# info = c.get_info("localhost", 6060)
-# print(info)
-# flag = c.ping(info)
-# print(flag)
-# # 
-# support = c.get_service_support(info, ServiceInfo("getProvider", 1))
-# print(support)
-# # print(EnvironmentInfo.current_env_info())
-# 
-# json = JsonSerializer()
-# req = ServiceRequest(ServiceInfo("getProvider", 1), EnvironmentInfo.current_env_info(), 1, [10])
-# json = JsonSerializer()
-# out = BytesIO()
-# json.serialize(req, ServiceRequest, out)
-# 
-# 
+    nsinfo = property(__get_nsinfo)                  
 
-# ns = NSClient(info)
-# flag = ns.ping()
-# print(flag)
-# 
-# 
-# service = provider = ns.get_service_info_by_id(10)
-# print(service)
-# 
-# service  = ns.get_service_info_by_name(service.name)
-# print(service)
-# 
-# 
-# support = ns.get_provider(ServiceInfo("test", 10))
-# print(support)
-# 
-# support = ns.get_providers(ServiceInfo("test", 10))
-# if(len(support) > 0):
-#     support = support[0]
-#     print(support)
-# 
-# ns.unregister(support.service, support.provider)
-#  
-# support2 = ns.get_provider(ServiceInfo("test", 10))
-# print(support2)
-# 
-# ns.register(support)
-# 
-# support = ns.get_provider(ServiceInfo("test", 10))
-# print(support)
-# 
-# 
-# support = ns.get_provider(ServiceInfo("test", 10))
-# print(support)
-# 
-# flag = ns.check_provider_status(support.provider)
-# print(flag)
-# 
-# ns.unregister_all(support.provider)
-# 
-# support2 = ns.get_provider(ServiceInfo("test", 10))
-# print(support2)
-# 
-# ns.register(support)
-# 
-# support = ns.get_provider(ServiceInfo("test", 10))
-# print(support)
-
-
-# out = BytesIO()
-# json.serialize(sp.content[0], ServiceRequest,out)
-# print("** "+out.getvalue())
-# 
-# request = ServiceRequest.create(NameServerServices.CHECK_PROVIDER_STATUS.info, EnvironmentInfo.current_env_info() , 1, [sp.content[0]])
-# out = BytesIO()
-# json.serialize(request, ServiceRequest,out)
-# print(out.getvalue())
-
-# provider = ns.get_provider(ServiceInfo("test", 10))
-
-
-# flag = ns.check_provider_status(provider)
-# print(flag)
-
-
-
-if __name__ == '__main__':
-
-    c = ClientStub()
-    nsInfo = c.get_info("localhost", 6060)
-    print(nsInfo)
-    flag = c.ping(nsInfo)
-    print(flag)
-    
-    
-    client = NSClientStub(nsInfo, SimpleCache())
-    
-    service = client.get_service_info_by_id(10)
-    print(service)
-    
-    service = client.get_service_info_by_name('test')
-    print(service)
-    
-    
-    prov = client._get_provider(service)
-    print(prov)
-    
-    sup = client.get_service_support(service)
-    print(sup)
-    
-    
-    res = client.call(ServiceDescription(service, [int], int), [5], JsonSerializer());
-    print(res)
